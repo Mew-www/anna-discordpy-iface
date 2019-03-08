@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import discord
 import os
-from lib.messagehandlers import handle_changename
+from lib.messagehandlers import handle_changename, handle_hello
 
 
 def main():
@@ -24,6 +24,7 @@ def main():
     @anna.event
     async def on_message(msg):
         await handle_changename(msg, anna)
+        await handle_hello(msg, anna)
 
     anna.run(os.environ['DISCORD_BOT_CLIENT_SECRET_TOKEN'])
 
