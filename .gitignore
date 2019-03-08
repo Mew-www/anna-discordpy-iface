@@ -2,7 +2,7 @@
 /venv
 
 # Cached python
-/__pycache__
+__pycache__
 
 # IDE
 /.idea

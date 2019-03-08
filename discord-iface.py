@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import discord
 import os
+from lib.messagehandlers import handle_changename
 
 
 def main():
@@ -9,8 +10,8 @@ def main():
 
     @anna.event
     async def on_ready():
-        print('Connected to Discord as {}#{}'.format(anna.user.name, anna.user.discriminator))
-        print('Resuming on servers: {}'.format(', '.join(list('"{}"'.format(s.name) for s in anna.servers))))
+        servers = ', '.join(list('"{}"'.format(s.name) for s in anna.servers))
+        print('Connected to Discord as {}#{} on {}'.format(anna.user.name, anna.user.discriminator, servers))
 
     @anna.event
     async def on_server_join(server):
@@ -22,7 +23,7 @@ def main():
 
     @anna.event
     async def on_message(msg):
-        pass
+        await handle_changename(msg, anna)
 
     anna.run(os.environ['DISCORD_BOT_CLIENT_SECRET_TOKEN'])
 
