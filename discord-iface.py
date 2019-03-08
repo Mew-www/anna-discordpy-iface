@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import discord
 import os
-from lib.messagehandlers import handle_changename, handle_hello
+from lib.onmessage.administrative_handlers import handle_changename
+from lib.onmessage.common_handlers import handle_hello
 
 
 def main():
