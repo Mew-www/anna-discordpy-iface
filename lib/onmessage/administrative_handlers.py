@@ -59,7 +59,7 @@ async def handle_speaking(message, anna, voicebuffer):
         await anna.send_message(message.channel, 'Voice capabilities must first be initialized.')
     else:
         phrase = ' '.join(message.content.split(' ')[1:])
-        await voicebuffer.speak(phrase, cb_after=lambda x: print('finished speaking'))
+        voicebuffer.speak(phrase)
 
 
 @on_content_start("voice", prefix=command_prefix)
