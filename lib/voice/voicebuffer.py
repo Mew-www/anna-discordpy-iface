@@ -69,7 +69,7 @@ class VoiceBuffer:
         return future
 
     def is_voice_initialized(self):
-        return self._is_active and self._voice_client
+        return self._is_active and self._voice_client is not None
 
     async def speak(self, phrase, cb_after=None):
         """
