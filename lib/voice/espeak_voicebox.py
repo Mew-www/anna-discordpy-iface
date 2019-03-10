@@ -33,13 +33,6 @@ class ESpeakVoicebox(Voicebox):
                 'gap': 1,
                 'pitch': 50
             },
-            'pronounced_female': {
-                'voice': 'mb-fr4-en',
-                'speed': 135,
-                'amplitude': 50,
-                'gap': 1,
-                'pitch': 50
-            },
             'soft_robotic_female': {
                 'voice': 'mb-sw2-en',
                 'speed': 135,
