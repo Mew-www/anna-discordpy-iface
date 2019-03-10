@@ -64,5 +64,7 @@ async def handle_speaking(message, anna, voicebuffer):
 
 @on_content_start("voice", prefix=command_prefix)
 @on_authors(administrative_users)
-async def handle_setvoice(message, voicebox):
-    voicebox.reconfigure(message.content.split(' ')[1])
+async def handle_setvoice(message, anna, voicebox):
+    params = ' '.join(message.content.split(' ')[1:])
+    await anna.send_message(message.channel, voicebox.reconfigure(params))
+
