@@ -34,7 +34,7 @@ def main():
         await handle_voicejoin(msg, anna, voicebuffer)
         await handle_speaking(msg, anna, voicebuffer)
         await handle_voiceleave(msg, anna, voicebuffer)
-        await handle_setvoice(msg, voicebox)
+        await handle_setvoice(msg, anna, voicebox)
 
     anna.run(os.environ['DISCORD_BOT_CLIENT_SECRET_TOKEN'])
 
