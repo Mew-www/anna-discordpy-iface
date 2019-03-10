@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 import discord
 import os
+from lib.voice.espeak_voicebox import ESpeakVoicebox
+from lib.voice.voicebuffer import VoiceBuffer
 from lib.onmessage.administrative_handlers import handle_changename
+from lib.onmessage.administrative_handlers import handle_voicejoin, handle_speaking, handle_voiceleave
 from lib.onmessage.common_handlers import handle_hello
 
 
 def main():
     print('Discord client starting')
     anna = discord.Client(max_messages=1000)
+    voicebox = ESpeakVoicebox()
+    voicebuffer = VoiceBuffer(anna, voicebox)  # Essentially "Controller"; Buffers and relays requests to speak
 
     @anna.event
     async def on_ready():
@@ -26,6 +31,9 @@ def main():
     async def on_message(msg):
         await handle_changename(msg, anna)
         await handle_hello(msg, anna)
+        await handle_voicejoin(msg, anna, voicebuffer)
+        await handle_speaking(msg, anna, voicebuffer)
+        await handle_voiceleave(msg, anna, voicebuffer)
 
     anna.run(os.environ['DISCORD_BOT_CLIENT_SECRET_TOKEN'])
 

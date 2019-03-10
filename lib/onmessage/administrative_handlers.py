@@ -31,3 +31,32 @@ async def handle_changename(message, anna):
     new_alias = random.choice(names_countries)
     await anna.change_nickname(message.server.me, new_alias[0])
     await anna.send_message(message.channel, 'Of {} origin.'.format('/'.join(new_alias[1])))
+
+
+@on_content_start("cometalk", prefix=command_prefix)
+@on_authors(administrative_users)
+async def handle_voicejoin(message, anna, voicebuffer):
+    if voicebuffer.is_voice_initialized():
+        await anna.send_message(message.channel, 'Voice already initialized.')
+    elif not message.author.voice.voice_channel:
+        await anna.send_message(message.channel, '{} you\'re not on a voice channel'.format(message.author.mention))
+    else:
+        await voicebuffer.activate(message.author, message.server)
+
+
+@on_content_start("cu", prefix=command_prefix)
+@on_authors(administrative_users)
+async def handle_voiceleave(message, anna, voicebuffer):
+    if not voicebuffer.is_voice_initialized():
+        await anna.send_message(message.channel, 'No-op. Would have to be activated first in order to deactivate.')
+    else:
+        voicebuffer.deactivate()
+
+
+@on_content_start("say", prefix=command_prefix)
+async def handle_speaking(message, anna, voicebuffer):
+    if not voicebuffer.is_voice_initialized():
+        await anna.send_message(message.channel, 'Voice capabilities must first be initialized.')
+    else:
+        phrase = message.content.split(' ')[1:]
+        await voicebuffer.speak(phrase, cb_after=lambda x: print('finished speaking'))
