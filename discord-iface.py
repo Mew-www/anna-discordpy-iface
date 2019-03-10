@@ -4,7 +4,7 @@ import os
 from lib.voice.espeak_voicebox import ESpeakVoicebox
 from lib.voice.voicebuffer import VoiceBuffer
 from lib.onmessage.administrative_handlers import handle_changename
-from lib.onmessage.administrative_handlers import handle_voicejoin, handle_speaking, handle_voiceleave
+from lib.onmessage.administrative_handlers import handle_voicejoin, handle_speaking, handle_voiceleave, handle_setvoice
 from lib.onmessage.common_handlers import handle_hello
 
 
@@ -34,6 +34,7 @@ def main():
         await handle_voicejoin(msg, anna, voicebuffer)
         await handle_speaking(msg, anna, voicebuffer)
         await handle_voiceleave(msg, anna, voicebuffer)
+        await handle_setvoice(msg, voicebox)
 
     anna.run(os.environ['DISCORD_BOT_CLIENT_SECRET_TOKEN'])
 

@@ -60,3 +60,9 @@ async def handle_speaking(message, anna, voicebuffer):
     else:
         phrase = ' '.join(message.content.split(' ')[1:])
         await voicebuffer.speak(phrase, cb_after=lambda x: print('finished speaking'))
+
+
+@on_content_start("voice", prefix=command_prefix)
+@on_authors(administrative_users)
+async def handle_setvoice(message, voicebox):
+    voicebox.reconfigure(message.content.split(' ')[1])
