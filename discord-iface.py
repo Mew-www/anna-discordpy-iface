@@ -6,6 +6,7 @@ from lib.voice.voicebuffer import VoiceBuffer
 from lib.onmessage.administrative_handlers import handle_changename
 from lib.onmessage.administrative_handlers import handle_voicejoin, handle_speaking, handle_voiceleave, handle_setvoice
 from lib.onmessage.common_handlers import handle_hello
+from lib.onmember.administrative_handlers import handle_jorans_new_member
 
 
 def main():
@@ -35,6 +36,10 @@ def main():
         await handle_speaking(msg, anna, voicebuffer)
         await handle_voiceleave(msg, anna, voicebuffer)
         await handle_setvoice(msg, anna, voicebox)
+
+    @anna.event
+    async def on_member_join(member):
+        await handle_jorans_new_member(member, anna)
 
     anna.run(os.environ['DISCORD_BOT_CLIENT_SECRET_TOKEN'])
 
