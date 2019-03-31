@@ -21,7 +21,7 @@ class VoiceBuffer:
             priorities = []
         self._priorities = list(priorities)  # ['LOWEST_PRIORITY_IDENTIFIER', ..., 'HIGHEST_PRIORITY_IDENTIFIER']
         self._queued_messages = []  # [[phrase, priority_integer, time_added_int], ...]
-        self._queue_polling_task = None
+        self._is_polling_queue = False
 
     def add_to_queue(self, phrase, priority=None, lowest_priority=False, highest_priority=False):
         """
@@ -58,28 +58,26 @@ class VoiceBuffer:
         voice_client = await self._anna.join_voice_channel(requester.voice.voice_channel)
         self._voice_client = voice_client
 
-        # Create background task to poll for queued messages
-        async def poll_queued_messages():
-            # Recursive queue-speaking (that also considers any new messages, based on priority > time)
-            def speak_queued_messages():
-                self._queued_messages = sorted(self._queued_messages, key=lambda m: (m[1], -1 * m[2]))  # prio, time
-                message = self._queued_messages.pop()
-                if len(self._queued_messages) == 0:
-                    self.speak(message[0])
-                else:
-                    self.speak(message[0], cb_after=speak_queued_messages)
-            # Periodic 10s polling for non-empty queue
-            while True:
-                if (
-                        len(self._queued_messages) > 0
-                        and self._is_active
-                        and self._voice_client is not None
-                        and not self._is_speaking
-                ):
-                    speak_queued_messages()
-                asyncio.sleep(10)
+        # Recursive queue-speaking (that also considers any new messages, based on priority > time)
+        def speak_queued_messages():
+            self._queued_messages = sorted(self._queued_messages, key=lambda m: (m[1], -1 * m[2]))  # prio, time
+            message = self._queued_messages.pop()
+            if len(self._queued_messages) == 0:
+                self.speak(message[0])
+            else:
+                self.speak(message[0], cb_after=speak_queued_messages)
+        # Periodic 10s polling for non-empty queue
+        self._is_polling_queue = True
+        while self._is_polling_queue:
+            if (
+                    len(self._queued_messages) > 0
+                    and self._is_active
+                    and self._voice_client is not None
+                    and not self._is_speaking
+            ):
+                speak_queued_messages()
+            await asyncio.sleep(10)
 
-        self._queue_polling_task = asyncio.ensure_future(poll_queued_messages(), loop=self._voice_client.loop)
 
     def deactivate(self):
         """
@@ -87,7 +85,7 @@ class VoiceBuffer:
         """
         if not self.is_voice_initialized():
             return
-        self._queue_polling_task.cancel()
+        self._is_polling_queue = False
         future = asyncio.run_coroutine_threadsafe(self._voice_client.disconnect(), self._voice_client.loop)
         self._voice_client = None
         self._currently_activated_by = None
@@ -98,7 +96,7 @@ class VoiceBuffer:
     def is_voice_initialized(self):
         return self._is_active and self._voice_client is not None
 
-    async def speak(self, phrase, cb_after=None):
+    def speak(self, phrase, cb_after=None):
         """
         :param phrase: String of words to speak
         :param cb_after: Optional callback to run after finished speaking
