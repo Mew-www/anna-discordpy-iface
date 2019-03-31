@@ -1,8 +1,12 @@
+from discord import ChannelType
+
+
 async def handle_jorans_new_member(member, anna):
     DEFAULT_ROLE_NAME = 'Steffen\'s Crustaceans'
     if '{}#{}'.format(member.server.owner.name, member.server.owner.discriminator) == 'Joran#3781':
         # Ensure a channel is available
-        available_channels = [ch for ch in member.server.channels if 'rules' not in ch.name]
+        available_channels = [ch for ch in member.server.channels
+                              if 'rules' not in ch.name and ch.type == ChannelType.text]
         if not available_channels:
             return
         else:
