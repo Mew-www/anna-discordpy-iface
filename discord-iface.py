@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-import aiohttp
 import discord
 import os
-import asyncio
+from lib.utils import be_alive, gracefully_exit_discord
 from lib.voice.espeak_voicebox import ESpeakVoicebox
 from lib.voice.voicebuffer import VoiceBuffer
 from lib.onmessage.administrative_handlers import handle_changename
@@ -16,35 +15,6 @@ def main():
     anna = discord.Client(max_messages=1000)
     voicebox = ESpeakVoicebox()
     voicebuffer = VoiceBuffer(anna, voicebox)  # Essentially "Controller"; Buffers and relays requests to speak
-
-    # A background task to be alive
-    async def task():
-        await anna.wait_until_ready()
-        while True:
-            await asyncio.sleep(1)
-
-    # A blocking function to exit gracefully if must
-    def handle_exit():
-        print("Exiting Discord..")
-        anna.loop.run_until_complete(anna.logout())
-        for t in asyncio.Task.all_tasks(loop=anna.loop):
-            if t.done():
-                t.exception()
-                continue
-            t.cancel()
-            try:
-                anna.loop.run_until_complete(asyncio.wait_for(t, 5, loop=anna.loop))
-                t.exception()
-            except asyncio.InvalidStateError:
-                pass
-            except asyncio.TimeoutError:
-                pass
-            except asyncio.CancelledError:
-                pass
-            except aiohttp.errors.ClientResponseError:
-                pass
-            except ConnectionResetError:
-                pass
 
     while True:
 
@@ -76,13 +46,13 @@ def main():
         async def on_member_join(member):
             await handle_jorans_new_member(member, anna)
 
-        anna.loop.create_task(task())
+        anna.loop.create_task(be_alive(anna))
         try:
             anna.loop.run_until_complete(anna.start(os.environ['DISCORD_BOT_CLIENT_SECRET_TOKEN']))
         except ConnectionError:
-            handle_exit()
+            gracefully_exit_discord(anna)
         except KeyboardInterrupt:
-            handle_exit()
+            gracefully_exit_discord(anna)
             anna.loop.close()
             print('Manually exited.')
             break
