@@ -69,7 +69,7 @@ class VoiceBuffer:
         # Periodic 10s polling for non-empty queue
         self._is_polling_queue = True
         while self._is_polling_queue:
-            # TODO: PLACE fetch_new_messages HERE
+            # TODO: PLACE fetch_new_messages HERE (possibly also another call under every speak_queued_messages)
             if (
                     len(self._queued_messages) > 0
                     and self._is_active
