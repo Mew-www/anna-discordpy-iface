@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import aiohttp
 import discord
 import os
 import asyncio
@@ -40,6 +41,10 @@ def main():
                 pass
             except asyncio.CancelledError:
                 pass
+            except aiohttp.errors.ClientResponseError:
+                pass
+            except ConnectionResetError:
+                pass
 
     while True:
 
@@ -74,7 +79,7 @@ def main():
         anna.loop.create_task(task())
         try:
             anna.loop.run_until_complete(anna.start(os.environ['DISCORD_BOT_CLIENT_SECRET_TOKEN']))
-        except SystemExit:
+        except ConnectionError:
             handle_exit()
         except KeyboardInterrupt:
             handle_exit()
