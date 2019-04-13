@@ -69,6 +69,7 @@ class VoiceBuffer:
         # Periodic 10s polling for non-empty queue
         self._is_polling_queue = True
         while self._is_polling_queue:
+            # TODO: PLACE fetch_new_messages HERE
             if (
                     len(self._queued_messages) > 0
                     and self._is_active
@@ -77,7 +78,6 @@ class VoiceBuffer:
             ):
                 speak_queued_messages()
             await asyncio.sleep(10)
-
 
     def deactivate(self):
         """
